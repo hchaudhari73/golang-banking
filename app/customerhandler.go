@@ -20,7 +20,7 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
-
+	status := r.URL.Query().Get("status")
 	// customers := []Customer{
 	// 	{"Harshal", "Dombivli", "421202"},
 	// 	{"Bruce", "Gautom", "67709"},
@@ -28,7 +28,7 @@ func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Reque
 
 	fmt.Println("Endpoint hit: getAllCustomers")
 
-	customers, _ := ch.service.GetAllCustomer()
+	customers, _ := ch.service.GetAllCustomer(status)
 	if r.Header.Get("Content-Type") == "application/xml" {
 		w.Header().Add("Content-Type", "application/xml")
 		xml.NewEncoder(w).Encode(customers)

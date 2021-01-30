@@ -8,10 +8,10 @@ type Customer struct {
 	City        string
 	Zipcode     string
 	DateOfBirth string
-	Status      string
+	status      string
 }
 
 type CustomerRepository interface {
-	FindAll() ([]Customer, *errs.AppError)
+	FindAll(status string) ([]Customer, *errs.AppError)
 	ById(string) (*Customer, *errs.AppError)
 }

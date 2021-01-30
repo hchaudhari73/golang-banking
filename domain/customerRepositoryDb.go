@@ -14,10 +14,19 @@ type CustomerRepositoryDb struct {
 	client *sql.DB
 }
 
-func (d CustomerRepositoryDb) FindAll() ([]Customer, *errs.AppError) {
+func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError) {
+	var rows *sql.Rows
+	var err error
 
-	findAllSql := "select * from customers"
-	rows, err := d.client.Query(findAllSql)
+	if status == "" {
+		findAllSQL := "select customer_id, name, city, zipcode, date_of_birth, status from customers"
+		rows, err = d.client.Query(findAllSQL)
+
+	} else {
+		findAllSQL := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status=?"
+		rows, err = d.client.Query(findAllSQL, status)
+
+	}
 	if err != nil {
 		return nil, errs.NewUnexpectedError("Error while connecting to database")
 	}
@@ -25,7 +34,7 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, *errs.AppError) {
 	Customers := make([]Customer, 0)
 	for rows.Next() {
 		var c Customer
-		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
+		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.status)
 		if err != nil {
 			return nil, errs.NewUnexpectedError("Error while scanning customer")
 		}
@@ -38,7 +47,7 @@ func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	customerSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where customer_id = ?"
 	row := d.client.QueryRow(customerSql, id)
 	var c Customer
-	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
+	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("User Not Found")
