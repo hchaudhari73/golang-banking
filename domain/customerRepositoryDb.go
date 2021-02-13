@@ -1,13 +1,12 @@
 package domain
 
 import (
-	"log"
-
 	"database/sql"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/hchaudhari73/banking/errs"
+	"github.com/hchaudhari73/banking/logger"
 )
 
 type CustomerRepositoryDb struct {
@@ -28,6 +27,7 @@ func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError
 
 	}
 	if err != nil {
+		logger.Error("Error while connectin to database " + err.Error())
 		return nil, errs.NewUnexpectedError("Error while connecting to database")
 	}
 
@@ -36,7 +36,8 @@ func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError
 		var c Customer
 		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.status)
 		if err != nil {
-			return nil, errs.NewUnexpectedError("Error while scanning customer")
+			logger.Error("Error while scanning customers " + err.Error())
+			return nil, errs.NewUnexpectedError("Error while scanning customers " + err.Error())
 		}
 		Customers = append(Customers, c)
 	}
@@ -50,9 +51,10 @@ func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.status)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			logger.Error("User Not Found")
 			return nil, errs.NewNotFoundError("User Not Found")
 		} else {
-			log.Printf("Error while scannin customer %b\n", err.Error())
+			logger.Error("Error while scanning customer " + err.Error())
 			return nil, errs.NewUnexpectedError("Unexpected database error")
 		}
 
