@@ -28,7 +28,11 @@ func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Reque
 
 	fmt.Println("Endpoint hit: getAllCustomers")
 
-	customers, _ := ch.service.GetAllCustomer(status)
+	customers, err := ch.service.GetAllCustomer(status)
+	if err != nil {
+		fmt.Fprintf(w, "Could not connect to database")
+		return
+	}
 	if r.Header.Get("Content-Type") == "application/xml" {
 		w.Header().Add("Content-Type", "application/xml")
 		xml.NewEncoder(w).Encode(customers)

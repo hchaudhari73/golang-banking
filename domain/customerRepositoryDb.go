@@ -7,48 +7,56 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/hchaudhari73/banking/errs"
 	"github.com/hchaudhari73/banking/logger"
+	"github.com/jmoiron/sqlx"
 )
 
 type CustomerRepositoryDb struct {
-	client *sql.DB
+	client *sqlx.DB
 }
 
 func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError) {
-	var rows *sql.Rows
+	// var rows *sql.Rows
 	var err error
+	Customers := make([]Customer, 0)
 
 	if status == "" {
 		findAllSQL := "select customer_id, name, city, zipcode, date_of_birth, status from customers"
-		rows, err = d.client.Query(findAllSQL)
-
+		// rows, err = d.client.Query(findAllSQL)
+		err = d.client.Select(&Customers, findAllSQL)
 	} else {
 		findAllSQL := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status=?"
-		rows, err = d.client.Query(findAllSQL, status)
-
+		// rows, err = d.client.Query(findAllSQL, status)
+		err = d.client.Select(&Customers, findAllSQL, status)
 	}
 	if err != nil {
 		logger.Error("Error while connectin to database " + err.Error())
 		return nil, errs.NewUnexpectedError("Error while connecting to database")
 	}
 
-	Customers := make([]Customer, 0)
-	for rows.Next() {
-		var c Customer
-		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.status)
-		if err != nil {
-			logger.Error("Error while scanning customers " + err.Error())
-			return nil, errs.NewUnexpectedError("Error while scanning customers " + err.Error())
-		}
-		Customers = append(Customers, c)
-	}
+	// err = sqlx.StructScan(rows, &Customers)
+	// if err != nil {
+	// 	logger.Error("Error while scanning customers " + err.Error())
+	// 	return nil, errs.NewUnexpectedError("Error while scanning customers " + err.Error())
+	// }
+
+	// for rows.Next() {
+	// 	var c Customer
+	// 	err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.status)
+	// 	if err != nil {
+	// 		logger.Error("Error while scanning customers " + err.Error())
+	// 		return nil, errs.NewUnexpectedError("Error while scanning customers " + err.Error())
+	// 	}
+	// 	Customers = append(Customers, c)
+	// }
 	return Customers, nil
 }
 
 func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	customerSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where customer_id = ?"
-	row := d.client.QueryRow(customerSql, id)
+	// row := d.client.QueryRow(customerSql, id)
 	var c Customer
-	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.status)
+	err := d.client.Get(&c, customerSql, id)
+	// err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Error("User Not Found")
@@ -63,7 +71,7 @@ func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 }
 
 func NewCustomerRepositoryDb() CustomerRepositoryDb {
-	client, err := sql.Open("mysql", "root:mbatman@tcp(localhost:3306)/banking")
+	client, err := sqlx.Open("mysql", "root:mbatman@tcp(localhost:3306)/banking")
 	if err != nil {
 		panic(err)
 	}

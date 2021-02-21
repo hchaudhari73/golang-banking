@@ -1,5 +1,5 @@
 **Cmds to operate mysql server**
-    - service mysqld status
-    - service mysqld stop
-    - service mysqld start 
+    - service mysql status
+    - service mysql stop
+    - service mysql start 
 

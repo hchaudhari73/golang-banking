@@ -25,10 +25,10 @@ func init() {
 	// log, err = zap.NewProduction(zap.AddCallerSkip(1))
 
 	// // logger with custom config
-	// log, err = config.Build()
+	log, err = config.Build()
 
 	// // we can display function that is calling the logger similarly as before
-	log, err = config.Build(zap.AddCallerSkip(1))
+	// log, err = config.Build(zap.AddCallerSkip(1))
 
 	if err != nil {
 		panic(err)
