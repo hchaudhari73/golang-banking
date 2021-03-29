@@ -17,6 +17,9 @@ func init() {
 	encoderConfig.TimeKey = "timestamp"
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	config.EncoderConfig = encoderConfig
+	config.OutputPaths = []string{
+		"/home/harshal/Documents/go/udemy_01/bank/bank.log",
+	}
 
 	// //initiating vanila logger
 	// log, err = zap.NewProduction()
@@ -25,7 +28,7 @@ func init() {
 	// log, err = zap.NewProduction(zap.AddCallerSkip(1))
 
 	// // logger with custom config
-	log, err = config.Build()
+	log, err = config.Build(zap.AddCallerSkip(1))
 
 	// // we can display function that is calling the logger similarly as before
 	// log, err = config.Build(zap.AddCallerSkip(1))

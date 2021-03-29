@@ -32,6 +32,7 @@ func getDbClient() *sqlx.DB {
 	dbName := os.Getenv("DB_NAME")
 
 	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbAddr, dbPort, dbName)
+	// dataSource := fmt.Sprintf("%s@tcp(%s:%s)/%s", dbUser, dbAddr, dbPort, dbName)
 	client, err := sqlx.Open("mysql", dataSource)
 	if err != nil {
 		panic(err)
