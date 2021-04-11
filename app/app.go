@@ -60,11 +60,14 @@ func Start() {
 	//wiring
 	// ch := CustomerHandlers{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
 	customerRepositoryDb := domain.NewCustomerRepositoryDb(dbClient)
-	// accountRepositryDb := domain.NewAccountRepositoryDb(dbClient)
+	accountRepositoryDb := domain.NewAccountRepositoryDb(dbClient)
 	ch := CustomerHandlers{service.NewCustomerService(customerRepositoryDb)}
+	ah := AccountHandler{service.NewAccountService(accountRepositoryDb)}
 
-	myRouter.HandleFunc("/customers", ch.getAllCustomers).Methods("GET")
-	myRouter.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomer).Methods("GET")
+	// define routes
+	myRouter.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
+	myRouter.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomer).Methods(http.MethodGet)
+	myRouter.HandleFunc("/customers/{customer_id:[0-9]+}/account", ah.NewAccount).Methods(http.MethodPost)
 
 	address = os.Getenv("SERVER_ADDRESS")
 	port := os.Getenv("SERVER_PORT")
