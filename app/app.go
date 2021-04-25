@@ -68,6 +68,7 @@ func Start() {
 	myRouter.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 	myRouter.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomer).Methods(http.MethodGet)
 	myRouter.HandleFunc("/customers/{customer_id:[0-9]+}/account", ah.NewAccount).Methods(http.MethodPost)
+	myRouter.HandleFunc("/customers/{customer_id:[0-9]+}/account/{account_id:[0-9]+}", ah.MakeTransaction).Methods(http.MethodPost)
 
 	address = os.Getenv("SERVER_ADDRESS")
 	port := os.Getenv("SERVER_PORT")
